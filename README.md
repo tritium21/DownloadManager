@@ -8,5 +8,4 @@ horribly slow or obviously insecure -- hopefully.
 Probably don't use this in a high volume environment,
 but you do you, boo.
 
-> Note: No code has actually been written yet.  Look
-  elsewhere
+> Note: No back end code has been written, look elsewhere
