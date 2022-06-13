@@ -2,7 +2,8 @@ from aiohttp import web
 from aiohttp_jinja2 import setup as jinja2_setup
 from jinja2 import PackageLoader, pass_context
 
-from .views import routes
+from .views import routes, worker
+from .events import install_events
 
 
 def url_rewriter(env, prefix=None):
@@ -51,4 +52,5 @@ def init(config):
     env.globals['global_title'] = config.name
     url_rewriter(env, prefix=config.url_prefix)
     app.add_routes(route_rewriter(routes, prefix=config.route_prefix))
+    install_events(app, worker)
     return app

@@ -1,8 +1,25 @@
 ﻿{% extends "layout.html" %}
+{% from 'macros.html' import icon %}
 {% block title%}Download Manager{% endblock %}
 {% block content %}
 
 <ul id="download-list" class="list-group">
+    <li class="list-group-item">
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <div class="row">
+                        <div class="col-11 align-self-center">
+                            <input type="text" class="form-control bg-dark" id="url" placeholder="URL">
+                        </div>
+                        <div class="col-1 align-self-center">
+                            <button type="button" class="btn btn-primary" id="add-button">{{ icon("download", title="Add download") }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </li>
 </ul>
 
 <template id="download-template">
@@ -12,16 +29,14 @@
                 <h5 class="card-title"><a href="#" class="download-title"></a></h5>
             </div>
             <div class="card-body row py-1">
-                <div class="col-9 align-self-center">
+                <div class="col-11 align-self-center">
                     <div class="progress">
                         <div class="download-bar progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                     </div>
                 </div>
-                <div class="col-1 align-self-center">
-                    <button type="button" class="btn btn-primary download-cancel">Cancel</button>
-                </div>
-                <div class="col-1 align-self-center">
-                    <button type="button" class="btn btn-primary download-remove">Remove</button>
+                <div class="col-1 align-self-center btn-group btn-group-sm">
+                    <button type="button" class="btn btn-primary download-cancel">{{ icon("cancel", title="Cancel download") }}</button>
+                    <button type="button" class="btn btn-primary download-remove">{{ icon("remove", title="Remove download") }}</button>
                 </div>
             </div>
             <div class="card-footer text-muted py-1">
@@ -37,12 +52,18 @@
         'status': "{{ url('status') }}",
         'remove': "{{ url('remove') }}",
         'cancel': "{{ url('cancel') }}",
+        'add': "{{ url('add') }}",
         'sse': "{{ url('sse') }}",
     };
     function humanFileSize(size) {
         var i = Math.floor( Math.log(size) / Math.log(1024) );
         return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     };
+    $('#add-button').on('click', function() {
+        var url = $('#url').val();
+        $.post(URLS['add'], {'url': url});
+        $('#url').val("");
+    });
 
     class Download {
         constructor(data) {
@@ -106,13 +127,20 @@
     class DownloadManager {
         constructor() {
             this.downloads = {};
-            $.getJSON(URLS['status'], function(data) {
-                data.forEach(this.addDownload.bind(this));
-            }.bind(this));
             this.events = new EventSource(URLS['sse']);
             this.events.addEventListener("update", this.update.bind(this));
             this.events.addEventListener("remove", this.remove.bind(this));
             this.events.addEventListener("add", this.add.bind(this));
+            this.resync()
+        }
+        
+        resync() {
+            for (var member in this.downloads) {
+                delete this.downloads[member];
+            }
+            $.getJSON(URLS['status'], function(data) {
+                data.forEach(this.addDownload.bind(this));
+            }.bind(this));
         }
 
         addDownload(element) {

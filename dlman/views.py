@@ -1,4 +1,4 @@
-from asyncio import sleep
+from asyncio import sleep, create_task, gather
 from json import dumps
 from pathlib import Path
 
@@ -20,28 +20,38 @@ TEST_DATA = [
     },
 ]
 
-@routes.get('/_sse', name='sse')
-async def sse(request):
+
+async def worker(app):
     import random
-    async with sse_response(request) as resp:
-        while True:
+    while True:
+        delay = create_task(sleep(1))
+        fs = []
+        for stream in app["streams"]:
             com = random.randint(0, 69420)
             fail = bool(random.randint(0, 1))
             TEST_DATA[0]['complete'] = com
             TEST_DATA[0]['failed'] = fail
-            td = dumps(TEST_DATA)
-            await resp.send(td, event="update")
-            await sleep(1)
-            if bool(random.randint(0, 1)):
-                await resp.send(td, event="remove")
-                await sleep(1)
-                await resp.send(td, event="add")
-                await sleep(1)
-    return resp
+            fs.append(stream.send(dumps(TEST_DATA), event='update'))
+        await gather(*fs)
+        await delay
+
+
+@routes.get('/_sse', name='sse')
+async def sse(request):
+    # see worker for actual view.  I know.
+    stream = await sse_response(request)
+    request.app["streams"].add(stream)
+    try:
+        await stream.wait()
+    finally:
+        request.app["streams"].discard(stream)
+    return stream
+
 
 @routes.get('/status', name='status')
 async def status(request):
     return web.json_response(TEST_DATA)
+
 
 @routes.post('/cancel', name='cancel')
 async def cancel(request):
@@ -50,12 +60,18 @@ async def cancel(request):
         return web.json_response({'id': data['id'], 'failed': True})
     raise web.HTTPForbidden()
 
+
 @routes.post('/remove', name='remove')
 async def remove(request):
     data = await request.post()
     if data['id'] in [d['id'] for d in TEST_DATA]:
         return web.json_response({'id': data['id'], 'failed': True})
     raise web.HTTPForbidden()
+
+@routes.post('/add', name='add')
+async def remove(request):
+    data = await request.post()
+    return web.json_response({})
 
 @routes.get('/')
 @template('index.html')

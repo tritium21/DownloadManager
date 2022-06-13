@@ -1,18 +1,18 @@
 @font-face {
-  font-family: 'webindex-font';
-  src:  url('fonts/webindex-font.eot?h5pycs');
-  src:  url('fonts/webindex-font.eot?h5pycs#iefix') format('embedded-opentype'),
-    url('fonts/webindex-font.ttf?h5pycs') format('truetype'),
-    url('fonts/webindex-font.woff?h5pycs') format('woff'),
-    url('fonts/webindex-font.svg?h5pycs#webindex-font') format('svg');
+  font-family: 'dlman';
+  src:  url('fonts/dlman.eot?72la93');
+  src:  url('fonts/dlman.eot?72la93#iefix') format('embedded-opentype'),
+    url('fonts/dlman.ttf?72la93') format('truetype'),
+    url('fonts/dlman.woff?72la93') format('woff'),
+    url('fonts/dlman.svg?72la93#dlman') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="we-"], [class*=" we-"] {
+[class^="dl-"], [class*=" dl-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'webindex-font' !important;
+  font-family: 'dlman' !important;
   speak: never;
   font-style: normal;
   font-weight: normal;
@@ -25,33 +25,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.we-home:before {
-  content: "\e900";
+.dl-bin2:before {
+  content: "\e9ad";
 }
-.we-file-empty:before {
-  content: "\e924";
+.dl-cloud-download:before {
+  content: "\e9c2";
 }
-.we-file-text2:before {
-  content: "\e926";
-}
-.we-file-picture:before {
-  content: "\e927";
-}
-.we-file-music:before {
-  content: "\e928";
-}
-.we-file-video:before {
-  content: "\e92a";
-}
-.we-folder-open:before {
-  content: "\e930";
-}
-.we-folder-download:before {
-  content: "\e933";
-}
-.we-download:before {
-  content: "\e960";
-}
-.we-info:before {
-  content: "\ea0c";
+.dl-cancel-circle:before {
+  content: "\ea0d";
 }
