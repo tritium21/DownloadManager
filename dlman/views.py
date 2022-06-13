@@ -21,7 +21,7 @@ TEST_DATA = [
 ]
 
 
-async def worker(app):
+async def sse_worker(app):
     import random
     while True:
         delay = create_task(sleep(1))

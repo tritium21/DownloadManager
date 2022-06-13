@@ -2,7 +2,6 @@ import asyncio
 from functools import partial
 import weakref
 from contextlib import suppress
-from datetime import datetime
 from functools import partial
 
 
