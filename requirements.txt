@@ -80,9 +80,14 @@ aiohttp==3.8.1 \
     # via
     #   -r requirements.in
     #   aiohttp-jinja2
+    #   aiohttp-sse
 aiohttp-jinja2==1.5 \
     --hash=sha256:7c3ba5eac060b691f4e50534af2d79fca2a75712ebd2b25e6fcb1295859f910b \
     --hash=sha256:b55c0ed167b0cc4b6d6a50fb2299a44beb5dc4aec9df21305b91a5484694cf74
+    # via -r requirements.in
+aiohttp-sse==2.1.0 \
+    --hash=sha256:b31cbf99142ca0c93cfc180e3f32fcdca0bcab35367e1380bc70dfaaf88cdc60 \
+    --hash=sha256:dfe8f7271ab4470891fa1bfa1913d6889b3d19015dd3d3a4cab949e66971bbca
     # via -r requirements.in
 aiosignal==1.2.0 \
     --hash=sha256:26e62109036cd181df6e6ad646f91f0dcfd05fe16d0cb924138ff2ab75d64e3a \
@@ -163,6 +168,10 @@ frozenlist==1.3.0 \
     # via
     #   aiohttp
     #   aiosignal
+humanize==3.14.0 \
+    --hash=sha256:32bcf712ac98ff5e73627a9d31e1ba5650619008d6d13543b5d53b48e8ab8d43 \
+    --hash=sha256:60dd8c952b1df1ad83f0903844dec50a34ba7a04eea22a6b14204ffb62dbb0a4
+    # via jinja2-humanize-extension
 idna==3.3 \
     --hash=sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff \
     --hash=sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d
@@ -170,7 +179,13 @@ idna==3.3 \
 jinja2==3.1.2 \
     --hash=sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852 \
     --hash=sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61
-    # via aiohttp-jinja2
+    # via
+    #   aiohttp-jinja2
+    #   jinja2-humanize-extension
+jinja2-humanize-extension==0.2.1 \
+    --hash=sha256:19ec9f85104d6f29b8b4215930ad21674b361c9931476bf51e246d247a1f8571 \
+    --hash=sha256:d4243d738b05ebf19460ef4a8b13a319edf52b8339b9e33b6a0573f7ae83d7d3
+    # via -r requirements.in
 markupsafe==2.1.1 \
     --hash=sha256:0212a68688482dc52b2d45013df70d169f542b7394fc744c02a57374a4207003 \
     --hash=sha256:089cf3dbf0cd6c100f02945abeb18484bd1ee57a079aefd52cffd17fba910b88 \

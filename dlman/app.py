@@ -43,7 +43,7 @@ def init(config):
     app['config'] = config
     env = jinja2_setup(
         app,
-        loader=PackageLoader('webindex2'),
+        loader=PackageLoader(__package__),
         extensions=["jinja2_humanize_extension.HumanizeExtension"],
         trim_blocks=True,
         lstrip_blocks=True,
