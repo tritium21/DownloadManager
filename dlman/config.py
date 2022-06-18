@@ -1,9 +1,13 @@
+import mimetypes
 from dataclasses import field, dataclass
 from pathlib import Path
 from typing import Optional
 
 from marshmallow_dataclass import class_schema
 from tomlkit import loads as tomlloads
+
+mimetypes.init()
+mimetypes.add_type('application/javascript', '.js')
 
 
 @dataclass
