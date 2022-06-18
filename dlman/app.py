@@ -4,6 +4,7 @@ from jinja2 import PackageLoader, pass_context
 
 from .views import routes, sse_worker
 from .events import install_events
+from .download import Manager
 
 
 def url_rewriter(env, prefix=None):
@@ -42,6 +43,7 @@ def route_rewriter(routes, prefix=None):
 def init(config):
     app = web.Application()
     app['config'] = config
+    man = Manager.install(app)
     env = jinja2_setup(
         app,
         loader=PackageLoader(__package__),

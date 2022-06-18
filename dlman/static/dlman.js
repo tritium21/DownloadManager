@@ -15,6 +15,7 @@ class Download {
         this.element.find('#placeholder').attr('id', this.id);
         this.element.find('.download-title').text(this.name);
         this.element.find('.download-size').text(humanFileSize(this.size));
+        this.element.find('.download-complete').text(humanFileSize(this.complete));
         this.element.find('.download-cancel').on('click', this.cancel.bind(this));
         this.element.find('.download-remove').on('click', this.remove.bind(this));
         $('#download-list').append(this.element);
@@ -35,9 +36,11 @@ class Download {
 
     updateUI() {
         var percent = (this.complete / this.size) * 100
+        var rounded = percent.toFixed(1)
+        this.element.find('.download-complete').text(humanFileSize(this.complete));
         var bar = this.element.find('.download-bar')
-        bar.css("width", percent + "%").text(percent + "%");
-        bar.attr("aria-valuenow", percent);
+        bar.css("width", percent + "%").text(rounded + "%");
+        bar.attr("aria-valuenow", rounded);
         if (this.finished || this.failed) {
             this.element.find('.download-cancel').attr('disabled', true);
             bar.removeClass(['progress-bar-striped', 'progress-bar-animated'])

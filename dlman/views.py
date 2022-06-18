@@ -6,6 +6,9 @@ from aiohttp import web
 from aiohttp_jinja2 import template
 from aiohttp_sse import sse_response
 
+from .download import MANAGER
+from .events import STREAMS
+
 routes = web.RouteTableDef()
 routes.static('/static', (Path(__file__).resolve().parent / 'static'), name='static')
 
@@ -22,16 +25,13 @@ TEST_DATA = [
 
 
 async def sse_worker(app):
-    import random
+    channel = app[MANAGER].channel
     while True:
         delay = create_task(sleep(1))
         fs = []
-        for stream in app["streams"]:
-            com = random.randint(0, 69420)
-            fail = bool(random.randint(0, 1))
-            TEST_DATA[0]['complete'] = com
-            TEST_DATA[0]['failed'] = fail
-            fs.append(stream.send(dumps(TEST_DATA), event='update'))
+        for stream in app[STREAMS]:
+            dl = await channel.get()
+            fs.append(stream.send(dumps(dl), event='update'))
         await gather(*fs)
         await delay
 
@@ -40,17 +40,18 @@ async def sse_worker(app):
 async def sse(request):
     # see worker for actual view.  I know.
     stream = await sse_response(request)
-    request.app["streams"].add(stream)
+    request.app[STREAMS].add(stream)
     try:
         await stream.wait()
     finally:
-        request.app["streams"].discard(stream)
+        request.app[STREAMS].discard(stream)
     return stream
 
 
 @routes.get('/status', name='status')
 async def status(request):
-    return web.json_response(TEST_DATA)
+    data = request.app[MANAGER].status()
+    return web.json_response(data)
 
 
 @routes.post('/cancel', name='cancel')

@@ -4,26 +4,28 @@ import weakref
 from contextlib import suppress
 from functools import partial
 
+STREAMS = 'sse_streams'
+WORKER = 'sse_worker'
 
 async def on_startup(app, worker):
-    app["streams"] = weakref.WeakSet()
-    app["worker"] = app.loop.create_task(worker(app))
+    app[STREAMS] = weakref.WeakSet()
+    app[WORKER] = app.loop.create_task(worker(app))
 
 
 async def clean_up(app):
-    app["worker"].cancel()
+    app[WORKER].cancel()
     with suppress(asyncio.CancelledError):
-        await app["worker"]
+        await app[WORKER]
 
 
 async def on_shutdown(app):
     waiters = []
-    for stream in app["streams"]:
+    for stream in app[STREAMS]:
         stream.stop_streaming()
         waiters.append(stream.wait())
 
     await asyncio.gather(*waiters)
-    app["streams"].clear()
+    app[STREAMS].clear()
 
 
 def install_events(app, worker):
