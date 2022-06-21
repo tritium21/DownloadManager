@@ -61,8 +61,6 @@ async def add(request):
     return web.json_response(resp)
 
 @routes.get('/')
-@template('index.html')
+@template('index.jinja2')
 async def root(request):
     return {}
-
-
