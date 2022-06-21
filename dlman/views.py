@@ -1,4 +1,4 @@
-from asyncio import sleep, create_task, gather
+from asyncio import gather
 from json import dumps
 from pathlib import Path
 
@@ -12,28 +12,14 @@ from .events import STREAMS
 routes = web.RouteTableDef()
 routes.static('/static', (Path(__file__).resolve().parent / 'static'), name='static')
 
-TEST_DATA = [
-    {
-        'id': 'e699fdbf-eaa3-11ec-9df6-a85e4553818b',
-        'name': 'file.zip',
-        'size': '69420',
-        'complete': '69000',
-        'failed': False,
-        'finished': False,
-    },
-]
-
 
 async def sse_worker(app):
     channel = app[MANAGER].channel
-    while True:
-        delay = create_task(sleep(1))
+    async for event, dl in channel:
         fs = []
         for stream in app[STREAMS]:
-            dl = await channel.get()
-            fs.append(stream.send(dumps(dl), event='update'))
+            fs.append(stream.send(dumps(dl), event=event))
         await gather(*fs)
-        await delay
 
 
 @routes.get('/_sse', name='sse')
@@ -44,6 +30,7 @@ async def sse(request):
     try:
         await stream.wait()
     finally:
+        await stream.send("", event='close')
         request.app[STREAMS].discard(stream)
     return stream
 
@@ -57,22 +44,21 @@ async def status(request):
 @routes.post('/cancel', name='cancel')
 async def cancel(request):
     data = await request.post()
-    if data['id'] in [d['id'] for d in TEST_DATA]:
-        return web.json_response({'id': data['id'], 'failed': True})
-    raise web.HTTPForbidden()
-
+    resp = await request.app[MANAGER].cancel(data['id'])
+    return web.json_response(resp)
 
 @routes.post('/remove', name='remove')
 async def remove(request):
     data = await request.post()
-    if data['id'] in [d['id'] for d in TEST_DATA]:
-        return web.json_response({'id': data['id'], 'failed': True})
-    raise web.HTTPForbidden()
+    resp = await request.app[MANAGER].remove(data['id'])
+    return web.json_response(resp)
+
 
 @routes.post('/add', name='add')
-async def remove(request):
+async def add(request):
     data = await request.post()
-    return web.json_response({})
+    resp = await request.app[MANAGER].from_url(data['url'])
+    return web.json_response(resp)
 
 @routes.get('/')
 @template('index.html')
